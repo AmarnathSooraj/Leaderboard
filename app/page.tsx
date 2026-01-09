@@ -1,6 +1,8 @@
 export const dynamic = 'force-dynamic';
-
-import { LeaderboardItem } from './components/LeaderboardItem';
+import { HeroTitle } from '@/components/HeroTitle';
+import { LeaderboardItem } from '@/components/LeaderboardItem';
+import { motion } from 'framer-motion';
+import { use } from 'react';
 
 type SheetResult = {
   cols: string[];
@@ -72,11 +74,22 @@ function projectData(
 }
 
 export default async function Home({
-  searchParams
+  searchParams,
 }: {
-  searchParams?: { cols?: string }
+  searchParams?: { cols?: string };
 }) {
-  const { cols, rows } = await fetchSheet();
+  let cols: string[] = [];
+  let rows: (string | number | null)[][] = [];
+  let fetchError: string | null = null;
+
+  try {
+    const sheet = await fetchSheet();
+    cols = sheet.cols;
+    rows = sheet.rows;
+  } catch (error) {
+    fetchError = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Failed to load sheet', error);
+  }
 
   const projectionSpec = searchParams?.cols ?? process.env.PROJECTION_COLS;
   const projected = projectData(cols, rows, projectionSpec);
@@ -88,19 +101,28 @@ export default async function Home({
   });
 
   return (
-    <div className="min-h-screen bg-[#121d29]">
-      <main className="max-w-4xl mx-auto pt-18 px-4">
+    <div className="min-h-screen bg-linear-to-b from-[#f9fdff] via-[#e9f0ff] to-[#c4d9ff] text-black pb-10 font-comfortaa">
+      <nav className='h-25 md:h-30 flex items-center justify-between mx-auto max-w-7xl py-6 px-4'>
+          <p className="font-extrabold text-4xl sm:text-5xl bg-clip-text bg-linear-to-b from-[#6c67c4] to-[#3b82f6] text-transparent">
+            μlearn
+            <span className="block text-2xl md:text-3xl font-extrabold text-right -mt-3">
+              cev
+            </span>
+          </p>
+        <a
+          href="https://app.mulearn.org/register"
+         className='text-sm md:text-md bg-linear-to-b from-[#6c67c4] to-[#3b82f6] text-white py-3 px-4 font-bold rounded-full'>
+          Join μlearn
+        </a>
+      </nav>
+      <main className="max-w-5xl mx-auto pt-10 md:pt-14 px-4">
         {/* Header */}
-        <div className=" text-center">
-          <div className="flex items-center gap-3 mb-2 justify-center">
-            <h1 className="text-3xl sm:text-4xl font-bold text-slate-100 tracking-tight">
-              Mulearn CEV Leaderboard
-            </h1>
-          </div>
+        <div className="text-center max-w-3xl mx-auto mb-2">
+          <HeroTitle />
         </div>
 
         {/* Table Header */}
-        <div className="flex justify-between items-center px-5 py-3 mb-2 text-sm font-medium text-slate-500 uppercase tracking-wider">
+        <div className="flex justify-between items-center px-5 py-3 mb-2 text-xs md:text-sm font-medium text-slate-500 uppercase tracking-wider">
           <div className="flex items-center gap-4">
             <span className="w-12 text-center">Rank</span>
             <span>Participant</span>
@@ -109,15 +131,19 @@ export default async function Home({
         </div>
 
         {/* Leaderboard */}
-        <div className="space-y-2">
+        <div className="space-y-2 p-4 border border-white rounded-xl">
           {sortedRows.length === 0 ? (
             <div className="p-10 text-center rounded-lg bg-slate-800 border border-slate-700">
               <p className="text-lg text-slate-300">No data found.</p>
-              {projectionSpec && (
+              {fetchError ? (
+                <p className="mt-2 text-sm text-slate-500">
+                  Unable to fetch leaderboard data: {fetchError}
+                </p>
+              ) : projectionSpec ? (
                 <p className="mt-2 text-sm text-slate-500">
                   Try adjusting the ?cols=... parameter or check your sheet.
                 </p>
-              )}
+              ) : null}
             </div>
           ) : (
             sortedRows.map((r, i) => (

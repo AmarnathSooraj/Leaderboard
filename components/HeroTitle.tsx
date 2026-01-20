@@ -11,7 +11,7 @@ export function HeroTitle() {
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="text-4xl md:text-7xl mb-2 font-semibold"
+        className="text-4xl sm:text-5xl md:text-7xl mb-2 font-bold tracking-tight text-[#163361]"
       >
         Lead your way{' '}
         <motion.span
@@ -33,9 +33,9 @@ export function HeroTitle() {
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut', delay: 0.15 }}
-        className="mt-1 text-md sm:text-lg md:text-xl text-gray-800"
+        className="mt-3 text-sm sm:text-base md:text-xl text-[#163361]/70 max-w-2xl px-4"
       >
-        Track your progress and rise through the ranks at MuLearn College of Engineering, Vadakara.
+        Track your progress and rise through the ranks at <span className="font-bold text-[#163361]/90">MuLearn CEV</span>.
       </motion.p>
 
     </div>
